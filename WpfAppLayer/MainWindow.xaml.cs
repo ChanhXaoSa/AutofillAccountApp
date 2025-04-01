@@ -54,20 +54,13 @@ namespace WpfAppLayer
 
         private void LoadAccounts()
         {
-            _accounts.AddRange(new List<Account>
-            {
-                new Account { AppName = "Riot", Username = "user1", Password = "password1" },
-                new Account { AppName = "Steam", Username = "user2", Password = "password2" },
-                new Account { AppName = "Epic", Username = "user3", Password = "password3" } 
-            });
-
             if (File.Exists("accounts.json"))
             {
                 var accounts = File.ReadAllText("accounts.json");
                 _accounts = JsonConvert.DeserializeObject<List<Account>>(accounts);
             }
 
-            AccountComboBox.ItemsSource = _accounts;
+            AccountListBox.ItemsSource = _accounts;
         }
 
         private void LoadPositions()
@@ -79,23 +72,31 @@ namespace WpfAppLayer
             }
         }
 
-        private void AccountComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void AccountListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            LoginButton.IsEnabled = AccountComboBox.SelectedItem != null;
-            SetPositionButton.IsEnabled = AccountComboBox.SelectedItem != null;
+            LoginButton.IsEnabled = AccountListBox.SelectedItem != null;
+            SetPositionButton.IsEnabled = AccountListBox.SelectedItem != null;
         }
 
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            if (AccountComboBox.SelectedItem is Account selectedAccount)
+            if (AccountListBox.SelectedItem is Account selectedAccount)
             {
                 await LoginToRiot(selectedAccount.Username, selectedAccount.Password, selectedAccount.AppName);
             }
         }
 
+        private void ManageAccountsButton_Click(object sender, RoutedEventArgs e)
+        {
+            var managerWindow = new ManagerAccountWindow(_accounts);
+            managerWindow.ShowDialog();
+            AccountListBox.ItemsSource = null;
+            AccountListBox.ItemsSource = _accounts;
+        }
+
         private void SetPositionButton_Click(object sender, RoutedEventArgs e)
         {
-            if (AccountComboBox.SelectedItem is Account selectedAccount)
+            if (AccountListBox.SelectedItem is Account selectedAccount)
             {
                 Process riotProcess = StartOrFocusRiotClient();
                 if (riotProcess == null)
@@ -126,7 +127,7 @@ namespace WpfAppLayer
                     if (MessageBox.Show($"Xác nhận lưu vị trí X: {_tempPosition.Value.X}, Y: {_tempPosition.Value.Y}?",
                         "Xác nhận", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                     {
-                        if (AccountComboBox.SelectedItem is Account selectedAccount)
+                        if (AccountListBox.SelectedItem is Account selectedAccount)
                         {
                             _positions[selectedAccount.AppName] = _tempPosition.Value;
                             SavePositions();
@@ -235,7 +236,7 @@ namespace WpfAppLayer
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            string json = Newtonsoft.Json.JsonConvert.SerializeObject(_accounts);
+            string json = JsonConvert.SerializeObject(_accounts);
             File.WriteAllText("accounts.json", json);
             SavePositions();
         }

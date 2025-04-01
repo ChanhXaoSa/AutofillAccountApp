@@ -9,12 +9,23 @@ namespace WpfAppLayer.Entities
 {
     public class Account
     {
+        private string _encryptedPassword;
         public string Username { get; set; }
-        private string _password;
+        //private string _password;
         public string Password
         {
-            get => EncryptionHelper.Decrypt(_password);
-            set => _password = EncryptionHelper.Encrypt(value);
+            get
+            {
+                if (string.IsNullOrEmpty(_encryptedPassword))
+                    return string.Empty;
+                return EncryptionHelper.Decrypt(_encryptedPassword);
+            }
+            set
+            {
+                _encryptedPassword = string.IsNullOrEmpty(value)
+                    ? string.Empty
+                    : EncryptionHelper.Encrypt(value);
+            }
         }
         public string AppName { get; set; }
         public string DisplayName => $"{AppName} - {Username}";

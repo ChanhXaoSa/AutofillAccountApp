@@ -15,11 +15,21 @@
         </Grid.RowDefinitions>
 
         <Label Content="Chọn tài khoản: " Grid.Row="0"/>
-        <ComboBox x:Name="AccountComboBox" Grid.Row="1" Margin="0, 5, 0, 10"
-          DisplayMemberPath="DisplayName"
-          SelectionChanged="AccountComboBox_SelectionChanged"/>
-        <Button x:Name="LoginButton" Content="Đăng nhập" Grid.Row="2"
-        Click="LoginButton_Click" Width="100" Height="30"/>
+        <ListBox x:Name="AccountListBox" Grid.Row="1" Margin="0,5,0,10"
+                 SelectionChanged="AccountListBox_SelectionChanged">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding DisplayName}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button x:Name="LoginButton" Content="Đăng nhập" 
+                    Click="LoginButton_Click" Width="100" Height="30" Margin="0,0,10,0"/>
+            <Button x:Name="ManageAccountsButton" Content="Quản lý tài khoản" 
+                    Click="ManageAccountsButton_Click" Width="120" Height="30"/>
+        </StackPanel>
+
         <Button x:Name="SetPositionButton" Content="Đặt vị trí Username" Grid.Row="3"
                 Click="SetPositionButton_Click" Width="150" Height="30" IsEnabled="False"/>
     </Grid>
